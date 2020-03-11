@@ -2,6 +2,8 @@ const path = require('path');
 const express = require('express');
 
 const sequelize = require('./utils/database');
+const mongoose = require('mongoose');
+
 const Product = require('./models/productModel');
 const User = require('./models/userModel');
 const Cart = require('./models/cartModel');
@@ -39,25 +41,29 @@ Order.belongsTo(User);
 User.hasMany(Order);
 Order.belongsToMany(Product, { through: OrderItem });
 
-sequelize
-  // .sync({ force: true })
-  .sync()
-  .then(result => {
-    return User.findByPk(1);
-    // console.log(result);
-  })
-  .then(user => {
-    if (!user)
-      return User.create({ name: 'Bruno', email: 'bruno.bmn@gmail.com' });
-    return user;
-  })
-  .then(user => {
-    // console.log(user);
-    user.createCart();
-  })
-  .then(cart => {
-    app.listen(3000);
-  })
-  .catch(err => {
-    console.log(err);
-  });
+mongoose.connect(
+  'mongodb+srv://brunonascimento:psp2mb@cluster0-yv9b6.gcp.mongodb.net/nodejs?retryWrites=true&w=majority'
+);
+
+// sequelize
+//   // .sync({ force: true })
+//   .sync()
+//   .then(result => {
+//     return User.findByPk(1);
+//     // console.log(result);
+//   })
+//   .then(user => {
+//     if (!user)
+//       return User.create({ name: 'Bruno', email: 'bruno.bmn@gmail.com' });
+//     return user;
+//   })
+//   .then(user => {
+//     // console.log(user);
+//     user.createCart();
+//   })
+//   .then(cart => {
+//     app.listen(3000);
+//   })
+//   .catch(err => {
+//     console.log(err);
+//   });
