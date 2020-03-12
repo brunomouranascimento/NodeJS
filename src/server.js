@@ -1,7 +1,7 @@
 const path = require('path');
 const express = require('express');
 
-const sequelize = require('./utils/database');
+// const sequelize = require('./utils/database');
 const mongoose = require('mongoose');
 
 const Product = require('./models/productModel');
@@ -41,9 +41,18 @@ Order.belongsTo(User);
 User.hasMany(Order);
 Order.belongsToMany(Product, { through: OrderItem });
 
-mongoose.connect(
-  'mongodb+srv://brunonascimento:psp2mb@cluster0-yv9b6.gcp.mongodb.net/nodejs?retryWrites=true&w=majority'
-);
+mongoose
+  .connect(
+    'mongodb+srv://brunonascimento:psp2mb@cluster0-yv9b6.gcp.mongodb.net/nodejs?retryWrites=true&w=majority',
+    {
+      useNewUrlParser: true,
+      useUnifiedTopology: true
+    }
+  )
+  .then(result => {
+    app.listen(3000);
+  })
+  .catch(err => console.log(err));
 
 // sequelize
 //   // .sync({ force: true })
