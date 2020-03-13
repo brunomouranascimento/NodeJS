@@ -22,7 +22,7 @@ app.set('views', 'src/views');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use((req, res, next) => {
-  User.findByPk(1)
+  User.findById('5e6bb4ef18951efae7a68b24')
     .then(user => {
       req.user = user;
       next();
@@ -31,26 +31,38 @@ app.use((req, res, next) => {
 });
 app.use(routes);
 
-Product.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
-User.hasMany(Product);
-User.hasOne(Cart);
-Cart.belongsTo(User);
-Cart.belongsToMany(Product, { through: CartItem });
-Product.belongsToMany(Cart, { through: CartItem });
-Order.belongsTo(User);
-User.hasMany(Order);
-Order.belongsToMany(Product, { through: OrderItem });
+// Product.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
+// User.hasMany(Product);
+// User.hasOne(Cart);
+// Cart.belongsTo(User);
+// Cart.belongsToMany(Product, { through: CartItem });
+// Product.belongsToMany(Cart, { through: CartItem });
+// Order.belongsTo(User);
+// User.hasMany(Order);
+// Order.belongsToMany(Product, { through: OrderItem });
 
 mongoose
   .connect(
-    'mongodb+srv://brunonascimento:psp2mb@cluster0-yv9b6.gcp.mongodb.net/nodejs?retryWrites=true&w=majority',
+    'mongodb+srv://brunonascimento:psp2mb@cluster0-yv9b6.gcp.mongodb.net/shop?retryWrites=true&w=majority',
     {
       useNewUrlParser: true,
       useUnifiedTopology: true
     }
   )
   .then(result => {
-    app.listen(3000);
+    User.findOne().then(user => {
+      if (!user) {
+        const user = new User({
+          name: 'Bruno',
+          email: 'bruno.bmn@gmail.com',
+          cart: {
+            items: []
+          }
+        });
+        user.save();
+      }
+    })
+    app.listen(3333);
   })
   .catch(err => console.log(err));
 
