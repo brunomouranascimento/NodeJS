@@ -43,7 +43,7 @@ app.use(routes);
 
 mongoose
   .connect(
-    'mongodb+srv://brunonascimento:psp2mb@cluster0-yv9b6.gcp.mongodb.net/shop?retryWrites=true&w=majority',
+    'mongodb+srv://brunonascimento:dAwtGfZjrJN6Y4Ta@cluster0-yv9b6.gcp.mongodb.net/shop?retryWrites=true&w=majority',
     {
       useNewUrlParser: true,
       useUnifiedTopology: true
@@ -61,7 +61,7 @@ mongoose
         });
         user.save();
       }
-    })
+    });
     app.listen(3333);
   })
   .catch(err => console.log(err));
