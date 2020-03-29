@@ -10,6 +10,8 @@ const routes = require('./routes');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
+const csrf = require('csurf');
+const flash = require('connect-flash');
 
 const MONGODB_URI =
   'mongodb+srv://brunonascimento:dAwtGfZjrJN6Y4Ta@cluster0-yv9b6.gcp.mongodb.net/shop';
@@ -19,6 +21,7 @@ const store = new MongoDBStore({
   uri: MONGODB_URI,
   collection: 'sessions'
 });
+const csrfProtection = csrf();
 
 app.set('view engine', 'ejs');
 app.set('views', 'src/views');
@@ -33,6 +36,9 @@ app.use(
     store: store
   })
 );
+app.use(csrfProtection);
+app.use(flash());
+
 app.use((req, res, next) => {
   User.findById('5e6bb4ef18951efae7a68b24')
     .then(user => {
@@ -41,6 +47,13 @@ app.use((req, res, next) => {
     })
     .catch(err => console.log(err));
 });
+
+app.use((req, res, next) => {
+  res.locals.isAuthenticated = req.session.isLoggedIn;
+  res.locals.csrfToken = req.csrfToken();
+  next();
+});
+
 app.use(routes);
 
 // Product.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
