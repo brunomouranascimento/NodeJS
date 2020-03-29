@@ -4,23 +4,35 @@ const express = require('express');
 // const sequelize = require('./utils/database');
 const mongoose = require('mongoose');
 
-const Product = require('./models/productModel');
 const User = require('./models/userModel');
-const Cart = require('./models/cartModel');
-const CartItem = require('./models/cartItemModel');
-const Order = require('./models/orderModel');
-const OrderItem = require('./models/orderItemModel');
 
 const routes = require('./routes');
 const bodyParser = require('body-parser');
+const session = require('express-session');
+const MongoDBStore = require('connect-mongodb-session')(session);
+
+const MONGODB_URI =
+  'mongodb+srv://brunonascimento:dAwtGfZjrJN6Y4Ta@cluster0-yv9b6.gcp.mongodb.net/shop';
 
 const app = express();
+const store = new MongoDBStore({
+  uri: MONGODB_URI,
+  collection: 'sessions'
+});
 
 app.set('view engine', 'ejs');
 app.set('views', 'src/views');
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(
+  session({
+    secret: 'my secret',
+    resave: false,
+    saveUninitialized: false,
+    store: store
+  })
+);
 app.use((req, res, next) => {
   User.findById('5e6bb4ef18951efae7a68b24')
     .then(user => {
@@ -42,13 +54,10 @@ app.use(routes);
 // Order.belongsToMany(Product, { through: OrderItem });
 
 mongoose
-  .connect(
-    'mongodb+srv://brunonascimento:dAwtGfZjrJN6Y4Ta@cluster0-yv9b6.gcp.mongodb.net/shop?retryWrites=true&w=majority',
-    {
-      useNewUrlParser: true,
-      useUnifiedTopology: true
-    }
-  )
+  .connect(MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  })
   .then(result => {
     User.findOne().then(user => {
       if (!user) {
