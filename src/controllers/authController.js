@@ -152,13 +152,14 @@ exports.postReset = (req, res, next) => {
         user.save();
       })
       .then(result => {
+        res.redirect('/');
         transporter.sendMail({
           to: req.body.email,
           from: 'shop@node.com',
           subject: 'Password reset',
           html: `
           <p>You request a password reset</p>
-          <p>Click this link to set a new password</p>
+          <p>Click this <a href="http//:localhost:3333/reset/${token}>link</a> to set a new password</p>
           `
         });
       })
