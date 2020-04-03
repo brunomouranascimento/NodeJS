@@ -12,6 +12,7 @@ routes.get('/signup', authController.getSignup);
 routes.post('/login', authController.postLogin);
 routes.post('/signup', authController.postSignup);
 routes.post('/logout', authController.postLogout);
+routes.get('/reset', authController.getReset);
 
 routes.get('/admin/add-product', isAuth, productsController.getAddProduct);
 routes.post('/admin/add-product', isAuth, productsController.postAddProduct);
