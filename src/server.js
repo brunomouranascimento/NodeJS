@@ -19,7 +19,7 @@ const MONGODB_URI =
 const app = express();
 const store = new MongoDBStore({
   uri: MONGODB_URI,
-  collection: 'sessions'
+  collection: 'sessions',
 });
 const csrfProtection = csrf();
 
@@ -33,7 +33,7 @@ app.use(
     secret: 'my secret',
     resave: false,
     saveUninitialized: false,
-    store: store
+    store: store,
   })
 );
 app.use(csrfProtection);
@@ -41,11 +41,11 @@ app.use(flash());
 
 app.use((req, res, next) => {
   User.findById('5e6bb4ef18951efae7a68b24')
-    .then(user => {
+    .then((user) => {
       req.user = user;
       next();
     })
-    .catch(err => console.log(err));
+    .catch((err) => console.log(err));
 });
 
 app.use((req, res, next) => {
@@ -69,24 +69,24 @@ app.use(routes);
 mongoose
   .connect(MONGODB_URI, {
     useNewUrlParser: true,
-    useUnifiedTopology: true
+    useUnifiedTopology: true,
   })
-  .then(result => {
-    User.findOne().then(user => {
+  .then((result) => {
+    User.findOne().then((user) => {
       if (!user) {
         const user = new User({
           name: 'Bruno',
           email: 'bruno.bmn@gmail.com',
           cart: {
-            items: []
-          }
+            items: [],
+          },
         });
         user.save();
       }
     });
     app.listen(3333);
   })
-  .catch(err => console.log(err));
+  .catch((err) => console.log(err));
 
 // sequelize
 //   // .sync({ force: true })

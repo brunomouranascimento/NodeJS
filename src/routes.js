@@ -13,6 +13,9 @@ routes.post('/login', authController.postLogin);
 routes.post('/signup', authController.postSignup);
 routes.post('/logout', authController.postLogout);
 routes.get('/reset', authController.getReset);
+routes.post('/reset', authController.postReset);
+routes.get('/reset/:token', authController.getNewPassword);
+routes.post('/new-password', authController.postNewPassword);
 
 routes.get('/admin/add-product', isAuth, productsController.getAddProduct);
 routes.post('/admin/add-product', isAuth, productsController.postAddProduct);
