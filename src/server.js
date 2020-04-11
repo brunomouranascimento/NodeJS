@@ -12,6 +12,9 @@ const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
 const csrf = require('csurf');
 const flash = require('connect-flash');
+const multer = require('multer');
+
+const errorController = require('./controllers/errorController');
 
 const MONGODB_URI =
   'mongodb+srv://brunonascimento:dAwtGfZjrJN6Y4Ta@cluster0-yv9b6.gcp.mongodb.net/shop';
@@ -19,9 +22,30 @@ const MONGODB_URI =
 const app = express();
 const store = new MongoDBStore({
   uri: MONGODB_URI,
-  collection: 'sessions',
+  collection: 'sessions'
 });
 const csrfProtection = csrf();
+
+const fileStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'images');
+  },
+  filename: (req, file, cb) => {
+    cb(null, new Date().toISOString() + '-' + file.originalname);
+  }
+});
+
+const fileFilter = (req, file, cb) => {
+  if (
+    file.mimetype === 'image/png' ||
+    file.mimetype === 'image/jpg' ||
+    file.mimetype === 'image/jpeg'
+  ) {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+};
 
 app.set('view engine', 'ejs');
 app.set('views', 'src/views');
@@ -33,7 +57,7 @@ app.use(
     secret: 'my secret',
     resave: false,
     saveUninitialized: false,
-    store: store,
+    store: store
   })
 );
 app.use(csrfProtection);
@@ -41,11 +65,11 @@ app.use(flash());
 
 app.use((req, res, next) => {
   User.findById('5e6bb4ef18951efae7a68b24')
-    .then((user) => {
+    .then(user => {
       req.user = user;
       next();
     })
-    .catch((err) => console.log(err));
+    .catch(err => console.log(err));
 });
 
 app.use((req, res, next) => {
@@ -55,6 +79,38 @@ app.use((req, res, next) => {
 });
 
 app.use(routes);
+
+app.use((req, res, next) => {
+  // throw new Error('Sync Dummy');
+  if (!req.session.user) {
+    return next();
+  }
+  User.findById(req.session.user._id)
+    .then(user => {
+      if (!user) {
+        return next();
+      }
+      req.user = user;
+      next();
+    })
+    .catch(err => {
+      next(new Error(err));
+    });
+});
+
+app.get('/500', errorController.get500);
+
+app.use(errorController.get404);
+
+app.use((error, req, res, next) => {
+  // res.status(error.httpStatusCode).render(...);
+  // res.redirect('/500');
+  res.status(500).render('500', {
+    pageTitle: 'Error!',
+    path: '/500',
+    isAuthenticated: req.session.isLoggedIn
+  });
+});
 
 // Product.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
 // User.hasMany(Product);
@@ -69,24 +125,24 @@ app.use(routes);
 mongoose
   .connect(MONGODB_URI, {
     useNewUrlParser: true,
-    useUnifiedTopology: true,
+    useUnifiedTopology: true
   })
-  .then((result) => {
-    User.findOne().then((user) => {
+  .then(result => {
+    User.findOne().then(user => {
       if (!user) {
         const user = new User({
           name: 'Bruno',
           email: 'bruno.bmn@gmail.com',
           cart: {
-            items: [],
-          },
+            items: []
+          }
         });
         user.save();
       }
     });
     app.listen(3333);
   })
-  .catch((err) => console.log(err));
+  .catch(err => console.log(err));
 
 // sequelize
 //   // .sync({ force: true })
